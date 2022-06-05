@@ -13,7 +13,7 @@ namespace ObjectTransmitter
             ChangedNodes = changedNodes ?? Array.Empty<ContextChangedNode>();
         }
 
-        public int GetChangedNodesCount() => ChangedNodes.Sum(GetChangedNodesCount);
+        internal int GetChangedNodesCount() => ChangedNodes.Sum(GetChangedNodesCount);
 
         private int GetChangedNodesCount(ContextChangedNode node)
         {

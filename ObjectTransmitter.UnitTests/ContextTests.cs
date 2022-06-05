@@ -57,5 +57,32 @@ namespace ObjectTransmitter.UnitTests
             Assert.AreEqual(transmitter.Context.IntProp, repeater.Context.IntProp);
             Assert.AreEqual(transmitter.Context.DoubleProp, repeater.Context.DoubleProp);
         }
+
+        [TestMethod]
+        public void RepeaterSubscriptionConfigureTest()
+        {
+            var repeater = ContextFactory.CreateRepeater<ContextSample>();
+
+            var intChanged = false;
+            var doubleChanged = false;
+            var stringChanged = false;
+            var innerObjectChanged = false;
+            var int1Changed = false;
+            var int2Changed = false;
+
+            repeater.ConfigureSubscribe(root =>
+            {
+                root.Subscribe(context => context.IntProp, intValue => intChanged = true);
+                root.Subscribe(context => context.DoubleProp, doubleValue => doubleChanged = true);
+                root.Subscribe(context => context.StringProp, stringValue => stringChanged = true);
+                root.Subscribe(context => context.InnerObjectProp, 
+                    innerObjectValue => innerObjectChanged = true,
+                    subscriber =>
+                    {
+                        subscriber.Subscribe(context => context.IntProp1, intValue => int1Changed = true);
+                        subscriber.Subscribe(context => context.IntProp2, intValue => int2Changed = true);
+                    });
+            });
+        }
     }
 }
