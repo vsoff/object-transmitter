@@ -11,8 +11,8 @@ namespace ObjectTransmitter.UnitTests
         public void CreateTransmitterTest()
         {
             var context = ClassGenerator.GenerateClass<IContextSample>();
-            context.DoubleProp = 2.3;
             context.IntProp = 321;
+            context.DoubleProp = 2.3;
             context.StringProp = "sdsdada";
         }
     }

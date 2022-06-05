@@ -1,4 +1,5 @@
-﻿using ObjectTransmitter.Exceptions;
+﻿using ObjectTransmitter.Collectors;
+using ObjectTransmitter.Exceptions;
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -15,7 +16,7 @@ namespace ObjectTransmitter.Reflection
 
             var moduleBuilder = CreateModuleBuilder();
             var generatedClassName = GetGeneratedName<TInterface>();
-            TypeBuilder typeBuilder = moduleBuilder.DefineType(generatedClassName, TypeAttributes.Public);
+            TypeBuilder typeBuilder = moduleBuilder.DefineType(generatedClassName, TypeAttributes.Public, typeof(Transmitter)); // TODO: FIX. Here is strong base type.
 
             // Implement interface.
             typeBuilder.AddInterfaceImplementation(typeof(TInterface));
@@ -44,6 +45,7 @@ namespace ObjectTransmitter.Reflection
             AssemblyName assemblyName = new AssemblyName(generatedAssemblyName);
             AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name);
+
             return moduleBuilder;
         }
 
@@ -71,9 +73,19 @@ namespace ObjectTransmitter.Reflection
             setIlGenerator.Emit(OpCodes.Ldarg_0);
             setIlGenerator.Emit(OpCodes.Ldarg_1);
             setIlGenerator.Emit(OpCodes.Stfld, fieldBuilder);
+            AddSetterTransmitterSaveMethod(setIlGenerator, propertyType);
             setIlGenerator.Emit(OpCodes.Ret);
 
             propertyBuilder.SetSetMethod(setMethodBuilder);
+        }
+
+        private static void AddSetterTransmitterSaveMethod(ILGenerator setIlGenerator, Type propertyType)
+        {
+            var saveChangeMethod = typeof(Transmitter).GetMethod("SaveChange", BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(propertyType); // TODO: FIX. Here is strong base type.
+            setIlGenerator.Emit(OpCodes.Ldarg_0);
+            setIlGenerator.Emit(OpCodes.Ldc_I4, 1337); // TODO: Property id.
+            setIlGenerator.Emit(OpCodes.Ldarg_1);
+            setIlGenerator.Emit(OpCodes.Callvirt, saveChangeMethod);
         }
 
         private static void AddMethod(TypeBuilder typeBuilder)
