@@ -10,7 +10,7 @@ namespace ObjectTransmitter.UnitTests
         [TestMethod]
         public void CreateTransmitterTest()
         {
-            var context = ClassGenerator.GenerateClass<IContextSample>();
+            var context = ClassGenerator.GenerateTransmitter<IContextSample>();
             context.IntProp = 321;
             context.DoubleProp = 2.3;
             context.StringProp = "sdsdada";
