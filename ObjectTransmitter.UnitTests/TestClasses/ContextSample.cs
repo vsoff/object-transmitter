@@ -1,14 +1,28 @@
 ﻿namespace ObjectTransmitter.UnitTests.TestClasses
 {
-    internal class ContextSample
+    public interface IContextSample
     {
         public int IntProp { get; set; }
         public double DoubleProp { get; set; }
         public string? StringProp { get; set; }
-        public InnerObject InnerObjectProp { get; set; }
+        public IInnerObject InnerObjectProp { get; set; }
     }
 
-    internal class InnerObject
+    public interface IInnerObject
+    {
+        public int IntProp1 { get; set; }
+        public int IntProp2 { get; set; }
+    }
+
+    internal class ContextSample : IContextSample
+    {
+        public int IntProp { get; set; }
+        public double DoubleProp { get; set; }
+        public string? StringProp { get; set; }
+        public IInnerObject InnerObjectProp { get; set; }
+    }
+
+    internal class InnerObject : IInnerObject
     {
         public int IntProp1 { get; set; }
         public int IntProp2 { get; set; }

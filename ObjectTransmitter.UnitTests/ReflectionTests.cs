@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ObjectTransmitter.Reflection;
 using ObjectTransmitter.UnitTests.TestClasses;
 
 namespace ObjectTransmitter.UnitTests
@@ -9,8 +10,10 @@ namespace ObjectTransmitter.UnitTests
         [TestMethod]
         public void CreateTransmitterTest()
         {
-            var transmitter = ContextFactory.CreateTransmitter<ContextSample>();
-            Assert.IsNotNull(transmitter);
+            var context = ClassGenerator.GenerateClass<IContextSample>();
+            context.DoubleProp = 2.3;
+            context.IntProp = 321;
+            context.StringProp = "sdsdada";
         }
     }
 }
