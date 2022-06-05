@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectTransmitter", "ObjectTransmitter\ObjectTransmitter.csproj", "{785070A1-B430-4401-93A8-533D84073370}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectTransmitter.UnitTests", "ObjectTransmitter.UnitTests\ObjectTransmitter.UnitTests.csproj", "{C9F872B9-7E0D-4239-B0D8-3F34014C90C2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{785070A1-B430-4401-93A8-533D84073370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{785070A1-B430-4401-93A8-533D84073370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{785070A1-B430-4401-93A8-533D84073370}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{785070A1-B430-4401-93A8-533D84073370}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9F872B9-7E0D-4239-B0D8-3F34014C90C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9F872B9-7E0D-4239-B0D8-3F34014C90C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9F872B9-7E0D-4239-B0D8-3F34014C90C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9F872B9-7E0D-4239-B0D8-3F34014C90C2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF08E0A4-B357-4DA6-A265-61624F1968FE}
+	EndGlobalSection
+EndGlobal
