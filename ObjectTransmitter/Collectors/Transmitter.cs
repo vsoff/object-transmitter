@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ObjectTransmitter.Collectors
+﻿namespace ObjectTransmitter.Collectors
 {
     public class Transmitter
     {
@@ -11,6 +7,16 @@ namespace ObjectTransmitter.Collectors
         protected void SaveChange<T>(int propertyId, T newValue)
         {
 
+        }
+    }
+
+    public class Repeater
+    {
+        internal const string PropertyChangedMethodName = nameof(PropertyChanged);
+
+        protected void PropertyChanged<T>(int propertyId, T newValue)
+        {
+            
         }
     }
 }

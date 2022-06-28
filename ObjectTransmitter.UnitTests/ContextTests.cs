@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ObjectTransmitter.Reflection;
 using ObjectTransmitter.UnitTests.TestClasses;
 
 namespace ObjectTransmitter.UnitTests
@@ -6,17 +7,30 @@ namespace ObjectTransmitter.UnitTests
     [TestClass]
     public class ContextTests
     {
+        private ContextFactory _contextFactory;
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            var builder = new ObjectTrasmitterContainerBuilder();
+            builder.RegisterInteface<IContextSample>();
+            var container = builder.BuildContainer();
+
+            _contextFactory = new ContextFactory(container);
+        }
+
+
         [TestMethod]
         public void CreateTransmitterTest()
         {
-            var transmitter = ContextFactory.CreateTransmitter<ContextSample>();
+            var transmitter = _contextFactory.CreateTransmitter<IContextSample>();
             Assert.IsNotNull(transmitter);
         }
 
         [TestMethod]
         public void CreateRepeaterTest()
         {
-            var repeater = ContextFactory.CreateRepeater<ContextSample>();
+            var repeater = _contextFactory.CreateRepeater<IContextSample>();
             Assert.IsNotNull(repeater);
         }
 
@@ -24,8 +38,8 @@ namespace ObjectTransmitter.UnitTests
         public void ApplyChangesEmptyTest()
         {
             // Create contexts.
-            var transmitter = ContextFactory.CreateTransmitter<ContextSample>();
-            var repeater = ContextFactory.CreateRepeater<ContextSample>();
+            var transmitter = _contextFactory.CreateTransmitter<IContextSample>();
+            var repeater = _contextFactory.CreateRepeater<IContextSample>();
             Assert.IsNotNull(transmitter);
             Assert.IsNotNull(repeater);
 
@@ -39,8 +53,8 @@ namespace ObjectTransmitter.UnitTests
         public void ApplyChangesWithChangesTest()
         {
             // Create contexts.
-            var transmitter = ContextFactory.CreateTransmitter<ContextSample>();
-            var repeater = ContextFactory.CreateRepeater<ContextSample>();
+            var transmitter = _contextFactory.CreateTransmitter<IContextSample>();
+            var repeater = _contextFactory.CreateRepeater<IContextSample>();
             Assert.IsNotNull(transmitter);
             Assert.IsNotNull(repeater);
 
@@ -61,7 +75,7 @@ namespace ObjectTransmitter.UnitTests
         [TestMethod]
         public void RepeaterSubscriptionConfigureTest()
         {
-            var repeater = ContextFactory.CreateRepeater<ContextSample>();
+            var repeater = _contextFactory.CreateRepeater<IContextSample>();
 
             var intChanged = false;
             var doubleChanged = false;

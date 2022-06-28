@@ -1,17 +1,29 @@
-﻿using System;
+﻿using ObjectTransmitter.Reflection;
+using System;
 
 namespace ObjectTransmitter
 {
-    public static class ContextFactory
+    public sealed class ContextFactory
     {
-        public static ContextTransmitter<T> CreateTransmitter<T>() where T : class
+        private ObjectTrasmitterContainer _container;
+
+        public ContextFactory(ObjectTrasmitterContainer container)
         {
-            throw new NotImplementedException();
+            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
-        public static ContextRepeater<T> CreateRepeater<T>() where T : class
+        public ContextTransmitter<T> CreateTransmitter<T>() where T : class
         {
-            throw new NotImplementedException();
+            var type = _container.GetTransmitterType<T>();
+            var instance = (T)Activator.CreateInstance(type);
+            return new ContextTransmitter<T>(instance);
+        }
+
+        public ContextRepeater<T> CreateRepeater<T>() where T : class
+        {
+            var type = _container.GetRepeaterType<T>();
+            var instance = (T)Activator.CreateInstance(type);
+            return new ContextRepeater<T>(instance);
         }
     }
 }
