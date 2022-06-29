@@ -1,18 +1,23 @@
-﻿using System;
+﻿using ObjectTransmitter.Collectors;
+using ObjectTransmitter.Reflection;
 
 namespace ObjectTransmitter
 {
-    public class ContextTransmitter<T> where T : class
+    public class ContextTransmitter<T>
+        where T : class
     {
-        internal ContextTransmitter(T context)
+        private readonly ObjectTrasmitterContainer _container;
+
+        internal ContextTransmitter(T context, ObjectTrasmitterContainer container)
         {
             Context = context;
+            _container = container;
         }
 
         public T Context { get; }
 
-        public bool HasChanges() => throw new NotImplementedException();
-        public void ClearChanges() => throw new NotImplementedException();
-        public ContextChangesRoot CollectChanges() => throw new NotImplementedException();
+        public bool HasChanges() => (Context as ITransmitter)?.HasChanges(_container) ?? false;
+        public void ClearChanges() => (Context as ITransmitter)?.ClearChanges(_container);
+        public ContextChangesRoot CollectChanges() => new ContextChangesRoot((Context as ITransmitter)?.CollectChanges(_container));
     }
 }

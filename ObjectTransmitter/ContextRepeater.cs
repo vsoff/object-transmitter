@@ -2,7 +2,8 @@
 
 namespace ObjectTransmitter
 {
-    public class ContextRepeater<T> where T : class
+    public class ContextRepeater<T>
+        where T : class
     {
         internal ContextRepeater(T context)
         {

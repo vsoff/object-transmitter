@@ -14,16 +14,26 @@ namespace ObjectTransmitter
 
         public ContextTransmitter<T> CreateTransmitter<T>() where T : class
         {
-            var type = _container.GetTransmitterType<T>();
-            var instance = (T)Activator.CreateInstance(type);
-            return new ContextTransmitter<T>(instance);
+            var instance = CreateTransmitterPart<T>();
+            return new ContextTransmitter<T>(instance, _container);
         }
 
         public ContextRepeater<T> CreateRepeater<T>() where T : class
         {
-            var type = _container.GetRepeaterType<T>();
-            var instance = (T)Activator.CreateInstance(type);
+            var instance = CreateRepeaterPart<T>();
             return new ContextRepeater<T>(instance);
+        }
+
+        public T CreateTransmitterPart<T>() where T : class
+        {
+            var type = _container.GetTransmitterType<T>();
+            return (T)Activator.CreateInstance(type);
+        }
+
+        public T CreateRepeaterPart<T>() where T : class
+        {
+            var type = _container.GetRepeaterType<T>();
+            return (T)Activator.CreateInstance(type);
         }
     }
 }

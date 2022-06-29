@@ -14,11 +14,11 @@ namespace ObjectTransmitter.UnitTests
         {
             var builder = new ObjectTrasmitterContainerBuilder();
             builder.RegisterInteface<IContextSample>();
+            builder.RegisterInteface<IInnerObject>();
             var container = builder.BuildContainer();
 
             _contextFactory = new ContextFactory(container);
         }
-
 
         [TestMethod]
         public void CreateTransmitterTest()

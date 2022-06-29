@@ -1,6 +1,6 @@
 ﻿namespace ObjectTransmitter
 {
-    internal enum ChangeType
+    public enum ChangeType
     {
         ValueNotChanged,
         ValueChanged,

@@ -45,7 +45,7 @@ namespace ObjectTransmitter.Reflection
                 generatedTypes.Add(new GeneratedTypes(type.Key, transmitterType, repeaterType, contractType));
             }
 
-            return new ObjectTrasmitterContainer(generatedTypes);
+            return new ObjectTrasmitterContainer(generatedTypes, _descriptionByType.Values);
         }
 
         private bool IsRegistered(Type type) => _descriptionByType.ContainsKey(type);
@@ -53,7 +53,7 @@ namespace ObjectTransmitter.Reflection
         private TypeDescription CreateDescription(Type type)
         {
             var properties = type.GetProperties()
-                .Select(property => new PropertyDescription(Interlocked.Increment(ref _lastPropertyId), property.Name, property.PropertyType))
+                .Select(propertyInfo => new PropertyDescription(Interlocked.Increment(ref _lastPropertyId), propertyInfo))
                 .ToList();
 
             return new TypeDescription(type, properties);

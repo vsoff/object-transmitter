@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ObjectTransmitter
 {
-    internal class ContextChangedNode
+    public class ContextChangedNode
     {
         public readonly int PropertyId;
         public readonly object NewValue;
