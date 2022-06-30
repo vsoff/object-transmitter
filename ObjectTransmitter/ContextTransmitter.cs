@@ -1,5 +1,6 @@
 ﻿using ObjectTransmitter.Collectors;
 using ObjectTransmitter.Reflection;
+using System;
 
 namespace ObjectTransmitter
 {
@@ -11,7 +12,7 @@ namespace ObjectTransmitter
         internal ContextTransmitter(T context, ObjectTrasmitterContainer container)
         {
             Context = context;
-            _container = container;
+            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
         public T Context { get; }

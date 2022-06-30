@@ -1,6 +1,7 @@
 ﻿using ObjectTransmitter.Exceptions;
 using ObjectTransmitter.Extensions;
 using ObjectTransmitter.Reflection.Models;
+using ObjectTransmitter.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,18 @@ namespace ObjectTransmitter.Reflection
 {
     public sealed class ObjectTrasmitterContainerBuilder
     {
-        private int _lastPropertyId = 0;
+        private readonly IDictionary<Type, TypeDescription> _descriptionByType;
 
-        private IDictionary<Type, TypeDescription> _descriptionByType;
+        private int _lastPropertyId = 0;
+        private ITransportSerializer _serializer;
 
         public ObjectTrasmitterContainerBuilder()
         {
             _descriptionByType = new Dictionary<Type, TypeDescription>();
+            _serializer = new DefaultTransportSerializer();
         }
+
+        public void SetSerializer(ITransportSerializer serializer) => _serializer = serializer;
 
         public void RegisterInteface<TInterface>() => RegisterInteface(typeof(TInterface));
 
@@ -45,7 +50,7 @@ namespace ObjectTransmitter.Reflection
                 generatedTypes.Add(new GeneratedTypes(type.Key, transmitterType, repeaterType, contractType));
             }
 
-            return new ObjectTrasmitterContainer(generatedTypes, _descriptionByType.Values);
+            return new ObjectTrasmitterContainer(_serializer, generatedTypes, _descriptionByType.Values);
         }
 
         private bool IsRegistered(Type type) => _descriptionByType.ContainsKey(type);

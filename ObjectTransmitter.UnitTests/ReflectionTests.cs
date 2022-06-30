@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using ObjectTransmitter.Reflection;
 using ObjectTransmitter.UnitTests.TestClasses;
 

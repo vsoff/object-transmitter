@@ -45,7 +45,6 @@ namespace ObjectTransmitter.UnitTests
 
             // Check empty applying.
             var changes = transmitter.CollectChanges();
-            Assert.AreEqual(changes.GetChangedNodesCount(), 0);
             repeater.ApplyChanges(changes);
         }
 
@@ -59,15 +58,32 @@ namespace ObjectTransmitter.UnitTests
             Assert.IsNotNull(repeater);
 
             // Change transmitter values.
-            transmitter.Context.IntProp = 123;
+            transmitter.Context.IntProp = 321;
             transmitter.Context.DoubleProp = 2.3;
+            transmitter.Context.StringProp = "sdsdada";
+            transmitter.Context.InnerObjectProp = _contextFactory.CreateTransmitterPart<IInnerObject>();
+            transmitter.Context.InnerObjectProp.IntProp1 = 555;
+            transmitter.Context.InnerObjectProp.IntProp2 = 666;
 
-            // Check empty applying.
+            // Change values.
             var changes = transmitter.CollectChanges();
-            Assert.AreEqual(changes.GetChangedNodesCount(), 2);
             repeater.ApplyChanges(changes);
+            transmitter.ClearChanges();
 
             // Check applyed values.
+            Assert.AreEqual(transmitter.Context.IntProp, repeater.Context.IntProp);
+            Assert.AreEqual(transmitter.Context.DoubleProp, repeater.Context.DoubleProp);
+
+            // Change transmitter values (2).
+            transmitter.Context.InnerObjectProp.IntProp1 = 1000;
+            transmitter.Context.InnerObjectProp.IntProp2 = 1001;
+
+            // Change values (2).
+            var changes2 = transmitter.CollectChanges();
+            repeater.ApplyChanges(changes2);
+            transmitter.ClearChanges();
+
+            // Check applyed values (2).
             Assert.AreEqual(transmitter.Context.IntProp, repeater.Context.IntProp);
             Assert.AreEqual(transmitter.Context.DoubleProp, repeater.Context.DoubleProp);
         }

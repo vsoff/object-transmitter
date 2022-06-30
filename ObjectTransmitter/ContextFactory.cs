@@ -21,7 +21,7 @@ namespace ObjectTransmitter
         public ContextRepeater<T> CreateRepeater<T>() where T : class
         {
             var instance = CreateRepeaterPart<T>();
-            return new ContextRepeater<T>(instance);
+            return new ContextRepeater<T>(instance, _container);
         }
 
         public T CreateTransmitterPart<T>() where T : class

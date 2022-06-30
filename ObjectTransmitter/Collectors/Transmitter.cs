@@ -17,7 +17,8 @@ namespace ObjectTransmitter.Collectors
             foreach (var change in _changes)
             {
                 processedPropertyIds.Add(change.Key);
-                changes.Add(new ContextChangedNode(change.Key, change.Value, null, ChangeType.ValueChanged));
+                var value = container.Serialize(change.Value, change.Key);
+                changes.Add(new ContextChangedNode(change.Key, value, null, ChangeType.ValueChanged));
             }
 
             foreach (var transmitter in GetPropertiesTransmitters(container))
@@ -52,6 +53,7 @@ namespace ObjectTransmitter.Collectors
             _changes[propertyId] = newValue;
         }
 
+        // TODO: Add cache.
         private IEnumerable<KeyValuePair<int, ITransmitter>> GetPropertiesTransmitters(ObjectTrasmitterContainer container)
         {
             // This is not optimal way, but I'll fix it in future.
