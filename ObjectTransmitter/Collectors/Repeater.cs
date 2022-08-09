@@ -8,8 +8,6 @@ namespace ObjectTransmitter.Collectors
 {
     public class Repeater : IRepeater
     {
-        internal const string PropertyChangedMethodName = nameof(PropertyChanged);
-
         public void ApplyChanges(IReadOnlyCollection<ContextChangedNode> changes, ObjectTrasmitterContainer container)
         {
             if (changes.Count == 0)
@@ -33,11 +31,6 @@ namespace ObjectTransmitter.Collectors
                     default: throw new ObjectTransmitterException($"Got unexpected {nameof(ChangeType)}: {change.ChangeType}");
                 }
             }
-        }
-
-        protected void PropertyChanged<T>(int propertyId, T newValue)
-        {
-            
         }
 
         // TODO: Add cache.

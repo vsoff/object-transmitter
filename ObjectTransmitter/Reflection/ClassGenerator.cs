@@ -11,7 +11,6 @@ namespace ObjectTransmitter.Reflection
     {
         public static Type GenerateTransmitter(TypeDescription typeDescription) => GenerateClass(ClassType.Transmitter, typeDescription);
         public static Type GenerateRepeater(TypeDescription typeDescription) => GenerateClass(ClassType.Repeater, typeDescription);
-        public static Type GenerateContract(TypeDescription typeDescription) => GenerateClass(ClassType.Contract, typeDescription);
 
         private static Type GenerateClass(ClassType classType, TypeDescription typeDescription)
         {
@@ -40,7 +39,6 @@ namespace ObjectTransmitter.Reflection
             {
                 case ClassType.Transmitter: return moduleBuilder.DefineType(generatedName, TypeAttributes.Public, typeof(Transmitter));
                 case ClassType.Repeater: return moduleBuilder.DefineType(generatedName, TypeAttributes.Public, typeof(Repeater));
-                case ClassType.Contract: return moduleBuilder.DefineType(generatedName, TypeAttributes.Public, null);
                 default: throw new ArgumentOutOfRangeException(nameof(classType), $"Unknown class type: {classType}");
             }
         }
@@ -100,23 +98,13 @@ namespace ObjectTransmitter.Reflection
                         setIlGenerator.Emit(OpCodes.Callvirt, saveChangeMethod);
                         break;
                     }
-                case ClassType.Repeater:
-                    {
-                        var propertyChangedMethod = typeof(Repeater).GetMethod(Repeater.PropertyChangedMethodName, BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(propertyDescription.Type);
-                        setIlGenerator.Emit(OpCodes.Ldarg_0);
-                        setIlGenerator.Emit(OpCodes.Ldc_I4, propertyDescription.PropertyId);
-                        setIlGenerator.Emit(OpCodes.Ldarg_1);
-                        setIlGenerator.Emit(OpCodes.Callvirt, propertyChangedMethod);
-                        break;
-                    }
-                case ClassType.Contract: break;
+                case ClassType.Repeater: break;
                 default: throw new ArgumentOutOfRangeException(nameof(classType), $"Unknown class type: {classType}");
             }
         }
 
         private enum ClassType
         {
-            Contract,
             Transmitter,
             Repeater
         }

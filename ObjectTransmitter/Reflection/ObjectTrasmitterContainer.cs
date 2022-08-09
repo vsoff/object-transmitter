@@ -31,7 +31,6 @@ namespace ObjectTransmitter.Reflection
                     throw new ObjectTransmitterException($"Types for `{typeDescription.Type}` not generated");
 
                 descriptionByType[typeGeneratedTypes.InterfaceType] = typeDescription;
-                descriptionByType[typeGeneratedTypes.ContractType] = typeDescription;
                 descriptionByType[typeGeneratedTypes.TransmitterType] = typeDescription;
                 descriptionByType[typeGeneratedTypes.RepeaterType] = typeDescription;
             }
@@ -49,7 +48,6 @@ namespace ObjectTransmitter.Reflection
 
         internal Type GetTransmitterType<TInterface>() => GetType<TInterface>(x => x.TransmitterType);
         internal Type GetRepeaterType<TInterface>() => GetType<TInterface>(x => x.RepeaterType);
-        internal Type GetContractType<TInterface>() => GetType<TInterface>(x => x.ContractType);
         
         internal TypeDescription GetDescription(Type type)
         {

@@ -7,14 +7,12 @@ namespace ObjectTransmitter.Reflection.Models
         public readonly Type InterfaceType;
         public readonly Type TransmitterType;
         public readonly Type RepeaterType;
-        public readonly Type ContractType;
 
-        public GeneratedTypes(Type interfaceType, Type transmitterType, Type repeaterType, Type contractType)
+        public GeneratedTypes(Type interfaceType, Type transmitterType, Type repeaterType)
         {
             InterfaceType = interfaceType;
             TransmitterType = transmitterType;
             RepeaterType = repeaterType;
-            ContractType = contractType;
         }
     }
 }

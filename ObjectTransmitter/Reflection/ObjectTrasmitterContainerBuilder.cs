@@ -45,9 +45,8 @@ namespace ObjectTransmitter.Reflection
             {
                 var transmitterType = ClassGenerator.GenerateTransmitter(type.Value);
                 var repeaterType = ClassGenerator.GenerateRepeater(type.Value);
-                var contractType = ClassGenerator.GenerateContract(type.Value);
 
-                generatedTypes.Add(new GeneratedTypes(type.Key, transmitterType, repeaterType, contractType));
+                generatedTypes.Add(new GeneratedTypes(type.Key, transmitterType, repeaterType));
             }
 
             return new ObjectTrasmitterContainer(_serializer, generatedTypes, _descriptionByType.Values);
