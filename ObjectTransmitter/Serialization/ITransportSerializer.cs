@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Text;
+﻿using System;
 
 namespace ObjectTransmitter.Serialization
 {
@@ -8,26 +6,5 @@ namespace ObjectTransmitter.Serialization
     {
         byte[] Serialize(object value, Type type);
         object Deserialize(byte[] bytes, Type type);
-    }
-
-    public class DefaultTransportSerializer : ITransportSerializer
-    {
-        public object Deserialize(byte[] bytes, Type type)
-        {
-            if (bytes == null) return null;
-
-            var json = Encoding.UTF8.GetString(bytes);
-            var data = JsonConvert.DeserializeObject(json, type);
-            return data;
-        }
-
-        public byte[] Serialize(object value, Type type)
-        {
-            if (value == null) return null;
-
-            var json = JsonConvert.SerializeObject(value);
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            return bytes;
-        }
     }
 }

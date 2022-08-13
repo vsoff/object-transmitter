@@ -54,6 +54,7 @@ namespace ObjectTransmitter.Collectors
         }
 
         // TODO: Add cache.
+        // TODO: Check possibility for inject container in constructor.
         private IEnumerable<KeyValuePair<int, ITransmitter>> GetPropertiesTransmitters(ObjectTrasmitterContainer container)
         {
             // This is not optimal way, but I'll fix it in future.

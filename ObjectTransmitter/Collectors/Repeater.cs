@@ -34,6 +34,7 @@ namespace ObjectTransmitter.Collectors
         }
 
         // TODO: Add cache.
+        // TODO: Check possibility for inject container in constructor.
         private IReadOnlyDictionary<int, PropertyInfo> GetPropertyInfoByIdMap(ObjectTrasmitterContainer container)
         {
             // This is not optimal way, but I'll fix it in future.
