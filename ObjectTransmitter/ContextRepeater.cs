@@ -1,6 +1,8 @@
-﻿using ObjectTransmitter.Collectors;
+﻿using ObjectTransmitter.Exceptions;
 using ObjectTransmitter.Reflection;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ObjectTransmitter
 {
@@ -21,7 +23,47 @@ namespace ObjectTransmitter
         {
             if (changes == null) throw new ArgumentNullException(nameof(changes));
 
-            (Context as IRepeater)?.ApplyChanges(changes.ChangedNodes, _container);
+            ApplyChanges(Context, changes.ChangedNodes, _container);
+        }
+
+        private static void ApplyChanges(object context, IReadOnlyCollection<ContextChangedNode> changes, ObjectTrasmitterContainer container)
+        {
+            try
+            {
+                if (context == null || changes.Count == 0)
+                    return;
+
+                // Checking type registered as repeater in container.
+                var contextType = context.GetType();
+                if (!container.TryGetDescription(contextType, out var contextTypeDescription))
+                    return;
+
+                var propertyInfoByPropertyId = contextTypeDescription.Properties.ToDictionary(prop => prop.PropertyId, prop => prop.PropertyInfo);
+                foreach (var change in changes)
+                {
+                    if (!propertyInfoByPropertyId.TryGetValue(change.PropertyId, out var propertyInfo))
+                        throw new ObjectTransmitterException($"Property with id `{change.PropertyId}` not found for type `{contextType.FullName}`");
+
+                    switch (change.ChangeType)
+                    {
+                        case ChangeType.ValueChanged:
+                            var newValue = container.Deserialize(change.NewValue, change.PropertyId);
+                            propertyInfo.SetValue(context, newValue);
+                            break;
+
+                        case ChangeType.ValueNotChanged:
+                            var value = propertyInfo.GetValue(context);
+                            ApplyChanges(value, change.ChildrenNodes, container);
+                            break;
+
+                        default: throw new ObjectTransmitterException($"Got unexpected {nameof(ChangeType)}: {change.ChangeType}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ObjectTransmitterException("Occured exception while applying changes", ex);
+            }
         }
     }
 }

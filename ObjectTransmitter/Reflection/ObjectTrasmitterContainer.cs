@@ -13,15 +13,18 @@ namespace ObjectTransmitter.Reflection
         private readonly IReadOnlyDictionary<Type, TypeDescription> _descriptionByType;
         private readonly IReadOnlyDictionary<int, Type> _typeByPropertyId;
         private readonly ITransportSerializer _serializer;
+        private readonly RepeaterInstanceFactory _repeaterInstanceFactory;
 
         internal ObjectTrasmitterContainer(
             ITransportSerializer serializer,
             IEnumerable<GeneratedTypes> generatedTypes,
-            IEnumerable<TypeDescription> typeDescriptions)
+            IEnumerable<TypeDescription> typeDescriptions,
+            IEnumerable<RepeaterFactory> repeaterFactories)
         {
             if (serializer is null) throw new ArgumentNullException(nameof(serializer));
             if (generatedTypes is null) throw new ArgumentNullException(nameof(generatedTypes));
             if (typeDescriptions is null) throw new ArgumentNullException(nameof(typeDescriptions));
+            if (repeaterFactories is null) throw new ArgumentNullException(nameof(repeaterFactories));
 
             var generatedTypeByInterface = generatedTypes.ToDictionary(types => types.InterfaceType, types => types);
             var descriptionByType = new Dictionary<Type, TypeDescription>();
@@ -32,7 +35,9 @@ namespace ObjectTransmitter.Reflection
 
                 descriptionByType[typeGeneratedTypes.InterfaceType] = typeDescription;
                 descriptionByType[typeGeneratedTypes.TransmitterType] = typeDescription;
-                descriptionByType[typeGeneratedTypes.RepeaterType] = typeDescription;
+
+                if (typeDescription.RepeaterType != null)
+                    descriptionByType[typeDescription.RepeaterType] = typeDescription;
             }
 
             var typeByPropertyId = descriptionByType.Values
@@ -40,15 +45,20 @@ namespace ObjectTransmitter.Reflection
                 .GroupBy(prop => prop.PropertyId)
                 .ToDictionary(prop => prop.Key, prop => prop.First().Type);
 
+            var repeaterInstanceFactory = new RepeaterInstanceFactory(repeaterFactories);
+
             _typeByPropertyId = typeByPropertyId;
             _serializer = serializer;
             _generatedTypeByInterface = generatedTypeByInterface;
             _descriptionByType = descriptionByType;
+            _repeaterInstanceFactory = repeaterInstanceFactory;
         }
 
         internal Type GetTransmitterType<TInterface>() => GetType<TInterface>(x => x.TransmitterType);
-        internal Type GetRepeaterType<TInterface>() => GetType<TInterface>(x => x.RepeaterType);
         
+        internal bool TryGetDescription(Type type, out TypeDescription typeDescription)
+            => _descriptionByType.TryGetValue(type, out typeDescription);
+
         internal TypeDescription GetDescription(Type type)
         {
             if (!_descriptionByType.TryGetValue(type, out var description))
@@ -72,10 +82,13 @@ namespace ObjectTransmitter.Reflection
             if (!_typeByPropertyId.TryGetValue(propertyId, out var type))
                 throw new ObjectTransmitterException($"Type for property with id `{propertyId}` not found");
 
-            var repeaterType = _generatedTypeByInterface.TryGetValue(type, out var generatedTypes) ? generatedTypes.RepeaterType : null;
+            if (_generatedTypeByInterface.ContainsKey(type))
+                throw new ObjectTransmitterException($"Repeater should be instantiated by factory");
 
-            return _serializer.Deserialize(bytes, repeaterType ?? type);
+            return _serializer.Deserialize(bytes, type);
         }
+
+        internal T CreateRepeaterInstance<T>() => (T)_repeaterInstanceFactory.CreateInstance(typeof(T));
 
         private Type GetType<TInterface>(Func<GeneratedTypes, Type> selector)
         {

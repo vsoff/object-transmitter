@@ -30,10 +30,6 @@ namespace ObjectTransmitter
             return (T)Activator.CreateInstance(type);
         }
 
-        public T CreateRepeaterPart<T>() where T : class
-        {
-            var type = _container.GetRepeaterType<T>();
-            return (T)Activator.CreateInstance(type);
-        }
+        private T CreateRepeaterPart<T>() where T : class => _container.CreateRepeaterInstance<T>();
     }
 }

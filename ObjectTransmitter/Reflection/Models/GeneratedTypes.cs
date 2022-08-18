@@ -6,13 +6,11 @@ namespace ObjectTransmitter.Reflection.Models
     {
         public readonly Type InterfaceType;
         public readonly Type TransmitterType;
-        public readonly Type RepeaterType;
 
-        public GeneratedTypes(Type interfaceType, Type transmitterType, Type repeaterType)
+        public GeneratedTypes(Type interfaceType, Type transmitterType)
         {
             InterfaceType = interfaceType;
             TransmitterType = transmitterType;
-            RepeaterType = repeaterType;
         }
     }
 }

@@ -15,10 +15,10 @@ namespace ObjectTransmitter.UnitTests
         public void Initialize()
         {
             var builder = new ObjectTrasmitterContainerBuilder();
-            builder.RegisterInteface<IContextSample>();
-            builder.RegisterInteface<IInnerObject>();
+            builder.RegisterInterface<IContextSample>();
+            builder.RegisterInterface<IInnerObject>();
             var container = builder.BuildContainer();
-
+            
             _contextFactory = new ContextFactory(container);
         }
 

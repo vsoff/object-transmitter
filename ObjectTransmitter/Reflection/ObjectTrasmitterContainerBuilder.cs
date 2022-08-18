@@ -11,6 +11,7 @@ namespace ObjectTransmitter.Reflection
 {
     public sealed class ObjectTrasmitterContainerBuilder
     {
+        private readonly IDictionary<Type, RepeaterFactory> _repeaterFactoryByType;
         private readonly IDictionary<Type, TypeDescription> _descriptionByType;
 
         private int _lastPropertyId = 0;
@@ -18,23 +19,29 @@ namespace ObjectTransmitter.Reflection
 
         public ObjectTrasmitterContainerBuilder()
         {
+            _repeaterFactoryByType = new Dictionary<Type, RepeaterFactory>();
             _descriptionByType = new Dictionary<Type, TypeDescription>();
             _serializer = new DefaultTransportSerializer();
         }
 
         public void SetSerializer(ITransportSerializer serializer) => _serializer = serializer;
 
-        public void RegisterInteface<TInterface>() => RegisterInteface(typeof(TInterface));
+        public void RegisterInterface<TInterface>() => RegisterInterfaceInternal(typeof(TInterface), null, null);
+        public void RegisterInteface<TInterface, TRepeater>(RepeaterFactory<TRepeater> repeaterFactory) where TRepeater : TInterface
+            => RegisterInterfaceInternal(typeof(TInterface), typeof(TRepeater), repeaterFactory);
 
-        public void RegisterInteface(Type type)
+        private void RegisterInterfaceInternal(Type type, Type repeaterType, RepeaterFactory repeaterFactory)
         {
             TypeValidator.ThrowIfTypeInvalid(type);
 
             if (IsRegistered(type))
                 throw new ObjectTransmitterException($"Type `{type.FullName}` is already registered");
 
-            var description = CreateDescription(type);
+            var description = CreateDescription(type, repeaterType);
             _descriptionByType[type] = description;
+            
+            if (repeaterFactory != null)
+                _repeaterFactoryByType[type] = repeaterFactory;
         }
 
         public ObjectTrasmitterContainer BuildContainer()
@@ -44,23 +51,22 @@ namespace ObjectTransmitter.Reflection
             foreach (var type in _descriptionByType)
             {
                 var transmitterType = ClassGenerator.GenerateTransmitter(type.Value);
-                var repeaterType = ClassGenerator.GenerateRepeater(type.Value);
 
-                generatedTypes.Add(new GeneratedTypes(type.Key, transmitterType, repeaterType));
+                generatedTypes.Add(new GeneratedTypes(type.Key, transmitterType));
             }
 
-            return new ObjectTrasmitterContainer(_serializer, generatedTypes, _descriptionByType.Values);
+            return new ObjectTrasmitterContainer(_serializer, generatedTypes, _descriptionByType.Values, _repeaterFactoryByType.Values);
         }
 
         private bool IsRegistered(Type type) => _descriptionByType.ContainsKey(type);
 
-        private TypeDescription CreateDescription(Type type)
+        private TypeDescription CreateDescription(Type type, Type repeaterType)
         {
             var properties = type.GetProperties()
                 .Select(propertyInfo => new PropertyDescription(Interlocked.Increment(ref _lastPropertyId), propertyInfo))
                 .ToList();
 
-            return new TypeDescription(type, properties);
+            return new TypeDescription(type, repeaterType, properties);
         }
     }
 }

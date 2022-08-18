@@ -9,22 +9,19 @@ namespace ObjectTransmitter.Reflection
 {
     internal static class ClassGenerator
     {
-        public static Type GenerateTransmitter(TypeDescription typeDescription) => GenerateClass(ClassType.Transmitter, typeDescription);
-        public static Type GenerateRepeater(TypeDescription typeDescription) => GenerateClass(ClassType.Repeater, typeDescription);
-
-        private static Type GenerateClass(ClassType classType, TypeDescription typeDescription)
-        {
+        public static Type GenerateTransmitter(TypeDescription typeDescription)
+        { 
             if (typeDescription == null) throw new ArgumentNullException(nameof(typeDescription));
             TypeValidator.ThrowIfTypeInvalid(typeDescription.Type);
 
             var moduleBuilder = CreateModuleBuilder();
-            TypeBuilder typeBuilder = CreateTypeBuilder(moduleBuilder, classType, typeDescription);
+            TypeBuilder typeBuilder = CreateTypeBuilder(moduleBuilder, typeDescription);
 
             // Implement interface.
             typeBuilder.AddInterfaceImplementation(typeDescription.Type);
             foreach (var propertyDescription in typeDescription.Properties)
             {
-                AddProperty(typeBuilder, propertyDescription, classType);
+                AddProperty(typeBuilder, propertyDescription);
             }
             
             // Create type.
@@ -32,21 +29,16 @@ namespace ObjectTransmitter.Reflection
             return generatedType;
         }
 
-        private static TypeBuilder CreateTypeBuilder(ModuleBuilder moduleBuilder, ClassType classType, TypeDescription typeDescription)
+        private static TypeBuilder CreateTypeBuilder(ModuleBuilder moduleBuilder, TypeDescription typeDescription)
         {
-            var generatedName = GetGeneratedName(classType, typeDescription);
-            switch (classType)
-            {
-                case ClassType.Transmitter: return moduleBuilder.DefineType(generatedName, TypeAttributes.Public, typeof(Transmitter));
-                case ClassType.Repeater: return moduleBuilder.DefineType(generatedName, TypeAttributes.Public, typeof(Repeater));
-                default: throw new ArgumentOutOfRangeException(nameof(classType), $"Unknown class type: {classType}");
-            }
+            var generatedName = GetGeneratedName(typeDescription);
+            return moduleBuilder.DefineType(generatedName, TypeAttributes.Public, typeof(Transmitter));
         }
 
-        private static string GetGeneratedName(ClassType classType, TypeDescription typeDescription)
+        private static string GetGeneratedName(TypeDescription typeDescription)
         {
             var baseName = typeDescription.Type.Name.Substring(1);
-            return $"{baseName}_{classType}_{Guid.NewGuid():N}";
+            return $"{baseName}_{Guid.NewGuid():N}";
         }
 
         private static ModuleBuilder CreateModuleBuilder()
@@ -59,7 +51,7 @@ namespace ObjectTransmitter.Reflection
             return moduleBuilder;
         }
 
-        private static void AddProperty(TypeBuilder typeBuilder, PropertyDescription propertyDescription, ClassType classType)
+        private static void AddProperty(TypeBuilder typeBuilder, PropertyDescription propertyDescription)
         {
             FieldBuilder fieldBuilder = typeBuilder.DefineField($"_{propertyDescription.Name}", propertyDescription.Type, FieldAttributes.Private);
 
@@ -80,33 +72,18 @@ namespace ObjectTransmitter.Reflection
             setIlGenerator.Emit(OpCodes.Ldarg_0);
             setIlGenerator.Emit(OpCodes.Ldarg_1);
             setIlGenerator.Emit(OpCodes.Stfld, fieldBuilder);
-            AppendSetterMethodAdditionalCall(setIlGenerator, propertyDescription, classType);
+            AppendSetterMethodAdditionalCall(setIlGenerator, propertyDescription);
             setIlGenerator.Emit(OpCodes.Ret);
             propertyBuilder.SetSetMethod(setMethodBuilder);
         }
 
-        private static void AppendSetterMethodAdditionalCall(ILGenerator setIlGenerator, PropertyDescription propertyDescription, ClassType classType)
+        private static void AppendSetterMethodAdditionalCall(ILGenerator setIlGenerator, PropertyDescription propertyDescription)
         {
-            switch (classType)
-            {
-                case ClassType.Transmitter:
-                    {
-                        var saveChangeMethod = typeof(Transmitter).GetMethod(Transmitter.SaveChangeMethodName, BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(propertyDescription.Type);
-                        setIlGenerator.Emit(OpCodes.Ldarg_0);
-                        setIlGenerator.Emit(OpCodes.Ldc_I4, propertyDescription.PropertyId);
-                        setIlGenerator.Emit(OpCodes.Ldarg_1);
-                        setIlGenerator.Emit(OpCodes.Callvirt, saveChangeMethod);
-                        break;
-                    }
-                case ClassType.Repeater: break;
-                default: throw new ArgumentOutOfRangeException(nameof(classType), $"Unknown class type: {classType}");
-            }
-        }
-
-        private enum ClassType
-        {
-            Transmitter,
-            Repeater
+            var saveChangeMethod = typeof(Transmitter).GetMethod(Transmitter.SaveChangeMethodName, BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(propertyDescription.Type);
+            setIlGenerator.Emit(OpCodes.Ldarg_0);
+            setIlGenerator.Emit(OpCodes.Ldc_I4, propertyDescription.PropertyId);
+            setIlGenerator.Emit(OpCodes.Ldarg_1);
+            setIlGenerator.Emit(OpCodes.Callvirt, saveChangeMethod);
         }
     }
 }

@@ -39,8 +39,8 @@ namespace ObjectTransmitter.UnitTests
         private static ObjectTrasmitterContainer CreateContainer()
         {
             var builder = new ObjectTrasmitterContainerBuilder();
-            builder.RegisterInteface<IContextSample>();
-            builder.RegisterInteface<IInnerObject>();
+            builder.RegisterInterface<IContextSample>();
+            builder.RegisterInterface<IInnerObject>();
             return builder.BuildContainer();
         }
     }
