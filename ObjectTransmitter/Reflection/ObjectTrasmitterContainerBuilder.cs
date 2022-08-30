@@ -27,7 +27,7 @@ namespace ObjectTransmitter.Reflection
         public void SetSerializer(ITransportSerializer serializer) => _serializer = serializer;
 
         public void RegisterInterface<TInterface>() => RegisterInterfaceInternal(typeof(TInterface), null, null);
-        public void RegisterInteface<TInterface, TRepeater>(RepeaterFactory<TRepeater> repeaterFactory) where TRepeater : TInterface
+        public void RegisterInterface<TInterface, TRepeater>(RepeaterFactory<TInterface, TRepeater> repeaterFactory) where TRepeater : TInterface
             => RegisterInterfaceInternal(typeof(TInterface), typeof(TRepeater), repeaterFactory);
 
         private void RegisterInterfaceInternal(Type type, Type repeaterType, RepeaterFactory repeaterFactory)

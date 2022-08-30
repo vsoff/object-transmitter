@@ -4,15 +4,17 @@ namespace ObjectTransmitter.Reflection
 {
     public abstract class RepeaterFactory
     {
+        public abstract Type RepeaterInterfaceType { get; }
         public abstract Type RepeaterType { get; }
         public abstract object Create();
     }
 
-    public abstract class RepeaterFactory<T> : RepeaterFactory
+    public abstract class RepeaterFactory<TInterface, TType> : RepeaterFactory
     {
-        public override Type RepeaterType { get; } = typeof(T);
+        public override Type RepeaterInterfaceType { get; } = typeof(TInterface);
+        public override Type RepeaterType { get; } = typeof(TType);
 
-        public abstract T CreateRepeater();
+        public abstract TType CreateRepeater();
 
         public override object Create() => CreateRepeater();
     }

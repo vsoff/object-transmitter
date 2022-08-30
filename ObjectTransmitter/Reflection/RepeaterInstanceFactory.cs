@@ -13,8 +13,10 @@ namespace ObjectTransmitter.Reflection
         {
             if (repeaterFactories == null) throw new ArgumentNullException(nameof(repeaterFactories));
 
-            _repeaterFactoriesByType = repeaterFactories.ToDictionary(x => x.RepeaterType, x => x);
+            _repeaterFactoriesByType = repeaterFactories.ToDictionary(x => x.RepeaterInterfaceType, x => x);
         }
+
+        public bool IsRepeaterRegistered(Type type) => _repeaterFactoriesByType.ContainsKey(type);
 
         public object CreateInstance(Type type)
         {

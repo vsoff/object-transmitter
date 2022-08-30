@@ -17,8 +17,20 @@ namespace ObjectTransmitter.Collectors
             foreach (var change in _changes)
             {
                 processedPropertyIds.Add(change.Key);
-                var value = container.Serialize(change.Value, change.Key);
-                changes.Add(new ContextChangedNode(change.Key, value, null, ChangeType.ValueChanged));
+                if (change.Value == null)
+                {
+                    changes.Add(new ContextChangedNode(change.Key, null, null, ChangeType.ValueReset));
+                }
+                else if (change.Value is ITransmitter transmitter)
+                {
+                    var innerChanges = transmitter.CollectChanges(container);
+                    changes.Add(new ContextChangedNode(change.Key, null, null, ChangeType.ValueChanged, innerChanges));
+                }
+                else
+                {
+                    var value = container.Serialize(change.Value, change.Key);
+                    changes.Add(new ContextChangedNode(change.Key, value, null, ChangeType.ValueChanged));
+                }
             }
 
             foreach (var transmitter in GetPropertiesTransmitters(container))

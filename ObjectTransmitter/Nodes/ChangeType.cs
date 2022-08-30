@@ -4,6 +4,7 @@
     {
         ValueNotChanged,
         ValueChanged,
+        ValueReset,
         AddedOrUpdatedItem,
         RemovedItem
     }

@@ -15,8 +15,8 @@ namespace ObjectTransmitter.UnitTests
         public void Initialize()
         {
             var builder = new ObjectTrasmitterContainerBuilder();
-            builder.RegisterInterface<IContextSample>();
-            builder.RegisterInterface<IInnerObject>();
+            builder.RegisterInterface<IContextSample, ContextSample>(new ContextSampleRepeaterFactory());
+            builder.RegisterInterface<IInnerObject, InnerObject>(new InnerObjectRepeaterFactory());
             var container = builder.BuildContainer();
             
             _contextFactory = new ContextFactory(container);

@@ -88,7 +88,9 @@ namespace ObjectTransmitter.Reflection
             return _serializer.Deserialize(bytes, type);
         }
 
-        internal T CreateRepeaterInstance<T>() => (T)_repeaterInstanceFactory.CreateInstance(typeof(T));
+        internal bool IsRepeaterRegistered(Type interfaceType) => _repeaterInstanceFactory.IsRepeaterRegistered(interfaceType);
+
+        internal object CreateRepeaterInstance(Type interfaceType) => _repeaterInstanceFactory.CreateInstance(interfaceType);
 
         private Type GetType<TInterface>(Func<GeneratedTypes, Type> selector)
         {

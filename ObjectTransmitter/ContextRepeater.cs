@@ -46,7 +46,19 @@ namespace ObjectTransmitter
 
                     switch (change.ChangeType)
                     {
+                        case ChangeType.ValueReset:
+                            propertyInfo.SetValue(context, null);
+                            break;
+
                         case ChangeType.ValueChanged:
+                            if (container.IsRepeaterRegistered(propertyInfo.PropertyType))
+                            {
+                                var newRepeater = container.CreateRepeaterInstance(propertyInfo.PropertyType);
+                                propertyInfo.SetValue(context, newRepeater);
+                                ApplyChanges(newRepeater, change.ChildrenNodes, container);
+                                break;
+                            }
+
                             var newValue = container.Deserialize(change.NewValue, change.PropertyId);
                             propertyInfo.SetValue(context, newValue);
                             break;
