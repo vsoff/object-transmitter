@@ -54,7 +54,20 @@ namespace ObjectTransmitter.Reflection
             _repeaterInstanceFactory = repeaterInstanceFactory;
         }
 
-        internal Type GetTransmitterType<TInterface>() => GetType<TInterface>(x => x.TransmitterType);
+        internal Type GetTransmitterType<TInterface>()
+        {
+            if (!TryGetTransmitterType<TInterface>(out var transmitterType))
+                throw new ObjectTransmitterException($"Transmitter for type `{typeof(TInterface).FullName}` is not found");
+
+            return transmitterType;
+        }
+
+        internal bool TryGetTransmitterType<TInterface>(out Type transmitterType)
+        {
+            var isExists = _generatedTypeByInterface.TryGetValue(typeof(TInterface), out var generatedTypes);
+            transmitterType = generatedTypes?.TransmitterType;
+            return isExists;
+        }
         
         internal bool TryGetDescription(Type type, out TypeDescription typeDescription)
             => _descriptionByType.TryGetValue(type, out typeDescription);
@@ -72,8 +85,12 @@ namespace ObjectTransmitter.Reflection
             if (!_typeByPropertyId.TryGetValue(propertyId, out var type))
                 throw new ObjectTransmitterException($"Type for property with id `{propertyId}` not found");
 
-            var transmitterType = _generatedTypeByInterface.TryGetValue(type, out var generatedTypes) ? generatedTypes.TransmitterType : null;
+            return _serializer.Serialize(value, type);
+        }
 
+        internal byte[] Serialize(object value, Type type)
+        {
+            var transmitterType = _generatedTypeByInterface.TryGetValue(type, out var generatedTypes) ? generatedTypes.TransmitterType : null;
             return _serializer.Serialize(value, transmitterType ?? type);
         }
 
@@ -82,6 +99,11 @@ namespace ObjectTransmitter.Reflection
             if (!_typeByPropertyId.TryGetValue(propertyId, out var type))
                 throw new ObjectTransmitterException($"Type for property with id `{propertyId}` not found");
 
+            return Deserialize(bytes, type);
+        }
+
+        internal object Deserialize(byte[] bytes, Type type)
+        {
             if (_generatedTypeByInterface.ContainsKey(type))
                 throw new ObjectTransmitterException($"Repeater should be instantiated by factory");
 
@@ -91,14 +113,5 @@ namespace ObjectTransmitter.Reflection
         internal bool IsRepeaterRegistered(Type interfaceType) => _repeaterInstanceFactory.IsRepeaterRegistered(interfaceType);
 
         internal object CreateRepeaterInstance(Type interfaceType) => _repeaterInstanceFactory.CreateInstance(interfaceType);
-
-        private Type GetType<TInterface>(Func<GeneratedTypes, Type> selector)
-        {
-            var interfaceType = typeof(TInterface);
-            if (!_generatedTypeByInterface.TryGetValue(interfaceType, out var generatedTypes))
-                throw new ObjectTransmitterException($"Type `{interfaceType.FullName}` is not found");
-
-            return selector.Invoke(generatedTypes);
-        }
     }
 }

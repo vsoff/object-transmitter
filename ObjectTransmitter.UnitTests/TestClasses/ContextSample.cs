@@ -1,4 +1,6 @@
-﻿using ObjectTransmitter.Reflection;
+﻿using ObjectTransmitter.Collectors.Collections;
+using ObjectTransmitter.Reflection;
+using System;
 
 namespace ObjectTransmitter.UnitTests.TestClasses
 {
@@ -8,6 +10,8 @@ namespace ObjectTransmitter.UnitTests.TestClasses
         public double DoubleProp { get; set; }
         public string? StringProp { get; set; }
         public IInnerObject? InnerObjectProp { get; set; }
+        public IObservableDictionary<Guid, IInnerObject> ObjectsMap { get; set; }
+        public IObservableDictionary<Guid, int> IntsMap { get; set; }
     }
 
     public interface IInnerObject
@@ -34,6 +38,12 @@ namespace ObjectTransmitter.UnitTests.TestClasses
 
         private IInnerObject? _innerObjectProp;
         public IInnerObject? InnerObjectProp { get => _innerObjectProp; set => _innerObjectProp = value; }
+
+        private IObservableDictionary<Guid, IInnerObject> _objectsMap;
+        public IObservableDictionary<Guid, IInnerObject> ObjectsMap { get => _objectsMap; set => _objectsMap = value; }
+
+        private IObservableDictionary<Guid, int> _intsMap;
+        public IObservableDictionary<Guid, int> IntsMap { get => _intsMap; set => _intsMap = value; }
     }
 
     public class InnerObject : IInnerObject

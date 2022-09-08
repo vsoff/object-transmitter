@@ -4,8 +4,7 @@ using System;
 
 namespace ObjectTransmitter
 {
-    public class ContextTransmitter<T>
-        where T : class
+    public class ContextTransmitter<T> where T : class
     {
         private readonly ObjectTrasmitterContainer _container;
 
