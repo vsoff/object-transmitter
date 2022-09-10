@@ -20,6 +20,8 @@ namespace ObjectTransmitter.Collectors.Collections
 
         private readonly bool _isValueTransmitter;
 
+        public int Count => _dictionary.Count;
+
         public TransmitterObservableDictionary(ObjectTrasmitterContainer container)
         {
             _container = container ?? throw new ArgumentNullException(nameof(container));
@@ -33,7 +35,11 @@ namespace ObjectTransmitter.Collectors.Collections
             _dictionary[key] = value;
 
             byte[] keyData = _container.Serialize(key, typeof(TKey));
-            if (_isValueTransmitter)
+            if (value == null)
+            {
+                _changedItemNodes[key] = new ContextChangedNode(EmptyPropertyId, null, keyData, ChangeType.ValueReset);
+            }
+            else if (_isValueTransmitter)
             {
                 var innerChanges = (value as ITransmitter).CollectChanges(_container);
                 _changedItemNodes[key] = new ContextChangedNode(EmptyPropertyId, null, keyData, ChangeType.AddedOrUpdatedItem, innerChanges);
@@ -95,19 +101,22 @@ namespace ObjectTransmitter.Collectors.Collections
 
                 if (_changedItemNodes.TryGetValue(keyWithValue.Key, out var changedItem))
                 {
-                    // NOTE: Here can be only new added items, with/without changes.
-                    if (changedItem.ChangeType != ChangeType.AddedOrUpdatedItem)
-                        throw new ObjectTransmitterException($"Unexpected type of {nameof(ChangeType)}: {changedItem.ChangeType}");
-
-                    if (changedSubItems == null || changedSubItems.Count == 0)
+                    if (changedItem.ChangeType != ChangeType.ValueReset)
                     {
-                        // SCENARIO: Item just added.
-                        result.Add(changedItem);
-                        continue;
+                        // NOTE: Here can be only new added items, with/without changes.
+                        if (changedItem.ChangeType != ChangeType.AddedOrUpdatedItem)
+                            throw new ObjectTransmitterException($"Unexpected type of {nameof(ChangeType)}: {changedItem.ChangeType}");
+
+                        if (changedSubItems == null || changedSubItems.Count == 0)
+                        {
+                            // SCENARIO: Item just added.
+                            result.Add(changedItem);
+                            continue;
+                        }
                     }
 
-                    // SCENARIO: Item added and updated.
-                    result.Add(new ContextChangedNode(EmptyPropertyId, changedItem.NewValue, changedItem.ItemKey, ChangeType.AddedOrUpdatedItem, changedSubItems));
+                    // SCENARIO: Item added and updated or reseted.
+                    result.Add(new ContextChangedNode(EmptyPropertyId, changedItem.NewValue, changedItem.ItemKey, changedItem.ChangeType, changedSubItems));
                     continue;
                 }
 

@@ -10,5 +10,6 @@ namespace ObjectTransmitter.Collectors.Collections
         void Remove(TKey key);
         bool ContainsKey(TKey key);
         TValue this[TKey key] { get; set; }
+        int Count { get; }
     }
 }

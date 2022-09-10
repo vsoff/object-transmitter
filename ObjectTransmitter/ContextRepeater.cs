@@ -118,6 +118,9 @@ namespace ObjectTransmitter
                 var key = container.Deserialize(change.ItemKey, keyType);
                 switch (change.ChangeType)
                 {
+                    case ChangeType.ValueReset:
+                        repeaterDictionary.AddOrUpdateItem(key, null);
+                        break;
                     case ChangeType.AddedOrUpdatedItem:
                         object value;
                         if (isValueRepeater)

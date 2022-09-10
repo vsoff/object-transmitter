@@ -19,6 +19,8 @@ namespace ObjectTransmitter.Collectors.Collections
         private readonly IDictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
         private Action<CollectionChangeInfo<TKey, TValue>> _collectionChangedCallback;
 
+        public int Count => _dictionary.Count;
+
         public RepeaterObservableDictionary()
         {
         }
